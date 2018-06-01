@@ -1,0 +1,308 @@
+capitulo 3 - debug applications and implements security.
+
+
+Objective 3.1: Validate application input
+-------------------------------------------
+
+* why validating application input is important
+en produccion hay que lidiar con varios tipos de entrada, algunas entradas pueden venir de otros sistemas o de usuarios.
+estos usuarios caen en dos formas
+usuarios inocentens
+usuarios maisiosos.
+
+* Managing data integrity
+
+cuando a la app ingresa data invalida, esto puede ser a la aplicacion fallar.
+hay cuatro tipos distintos de integracion de data.
+
+entity integrity: indica que cada entidad debe ser unica.
+domain integrity: se refiere a la validacion de un dato que una entidad contiene.
+user-defined integrity: contempla reglas de negocio que se necesitan seguir.
+
+
+*using parse, tryparse and convert.
+
+la mayoria de las entradas en una aplicacion vienen como un string, aunque si se sabe que representa 
+un entero o una fecha igual deberia validarse.
+.net tiene unos metodos que se utilizan para convertir de un tipo a otro.
+
+parse y tryparse 
+metodos para convertir de un tipo a otro,
+parse deberia usarse solo cuando se esta seguro que el valor que se envia sera existosamente transformado, 
+si una exepcion es lanzada eso denota un error en la aplicacion.
+
+parse si lanza exepciones como formatexception o argumentnullexception
+con parse se puede pasar informacion de cultura por si debe tomarse en cuenta el formato con el que el valor viene.
+
+
+tryparse se usa cuando no se esta seguro si el parseo funcionara.
+tryparse retorna un boolean que indica si se pudo parsear el valor o no.
+este deberia usarse cuando el usuario ingresa datos.
+
+con las fechas se debe tener en cuenta el tema de las diferencias horarias, y las culturas, mas cuando se trabaja en una 
+aplicacion que usa globalizacion.
+
+** es importante parsear las entradas de usuario con la cultura correcta. **
+diferencia entre parse/tryparse y convert es que converts acepta valores nulos en lugar de lanzar un argumentnullexception 
+returna el valor por default del tipo indicado.
+
+otra diferencia entre convert y parse es que parse toma un string unicamente, y convert utiliza otros valores base como argumento.
+
+** using regular expressions
+una expresion regular es un patron epsecifico usado para parsear o encontrar cohincidencias en strings.
+
+* validating json and XMl
+cuando se comparte data con otras aplicaciones se hace por medio de json o XMl
+.net ofrece una clase JavaScriptSerializer 
+para un XMl la validacion se puede hacer a travez de su XSD.
+
+
+
+
+Objective 3.2: Perform symmetric and asymmetric encryption
+-------------------------------------------
+
+algunos pasos para construir aplicaciones seguras es la autenticacion de usuarios, asegurarse que la data sea confidencia, y asegurarse que nadie pueda robarla.
+
+* using symmetric and asymmetric encryption
+criptagrafia es encripar y desencriptar datos, 
+encriptar -> tomar un texto plano y convertirulo en una secuencia de bytes no legibles(se corren algoritmos)
+
+desencriptar -> es lo opuesto.
+
+en criptografica se puede mantener el algoritmo secreto o se puede usar un algortimo publico y mantener la llave secreta.
+
+lo mejor es mantener el algoritmo publico ya que mejora la seguridad al ser algoritmos bien probados.
+
+la diferencia entre simetrico y asimetrico es la forma en como se usa la llave.
+
+un algoritmo simetrico usa solo una llave para encriptar y desencriptar los datos, se necesita pasar la llave original al receptor asi puede el desencriptar los datos.
+esto tiene el problema de seguridad de compartir las llaves.
+
+un algoritmo asimetrico usa dos llaves diferentes que son matematicamente relaciones entre ellos, pero aunq estan relacionados es infalible determinar uno cuando se sabe elotro.
+una llaves es publica y puede ser leida y usada por todo mundo la otra parte es privada y nunca debe ser conpartida con nadie mas.
+
+cuando se encripta algo con la llave publica puede ser desencrptado con la privada y viseversa.
+
+la otra diferencia entre ambos es el performance y tamaño de los mensajes, encriptacion simetrica es mas rapida que la encriptacion asimetrica 
+y mejor para conjuntos de datos muy largos, asimetric no es optima para encriptar mensajes largos pero se pueden encriptar pequeñas llaves, 
+combinar los dos puede usarse para transmitir muchos datos y encriptarlos.
+
+otro concepto en criptografia es el vector de inicializacion.
+
+el IV (initialization vector) es usado para agregar algun nivel de diferenciacion al encriptar data, IV se asegura que el mismo dato resulte en un mensaje encriptado 
+de forma diferente cada vez.
+
+* Working with encryption in the .net framework
+.net ofrece algunos algoritmos para encriptacion asymetrica y simetrica
+
+un algoritmo simetrico es AES.
+
+.net tambien permite trabajar con algoritmos asimetricos los cuales pueden ser RSACryptoServiceProvider and DSACryptopServiceProvider
+
+es importante almacenar la llave privada en un lugar seguro, es por eso que .net offrece un lugar seguro para almacenar llaves asimetricas en un contenedor de llaves (key container)
+este puede ser especifico apra un usuairo o para toda la maquina.
+
+* using hashing 
+
+hashing es el proceso de tomar un largo conjunto de datos y mapearlo a un conjunto mas pequeño.
+al usar hashing se puede mejorar el diseño de un conjunto de clases, se separan los datos en un conjunto de buckets.
+hashing es usado para chequear la integridad y la autenticidad de un mensaje.
+
+* managing and creating certificates
+
+los certificados digitales es donde hashng y encriptacion asymetrica se unen.
+ayudan a protejer la integridad de los datos.
+un certificado digital es la parte de una infraestructura de llave publica, (PKI) -> "Private Key Infraestructure" este es un sistema de certificados digitales, 
+autoridades de certificado que autentican y verifican la veracidad de cada parte involucrada.
+
+CA -> A certificate Authority es un emisor de certificados que es considerado seguro por todas las partes.
+los CA emiten certificados que contienen una llave publica, el objetivo por el que el certificado es emitodo y detalles del CA.
+
+a nivel de desarrollo se pueden generar certificados usando makecert.exe esto genera un x.509 certificate
+x.509 es un extendido estandar para definir certificados digitales.
+
+
+makecert testCert.cer -> crea un certificado
+
+makecert -n “CN=WouterDeKort” -sr currentuser -ss testCertStore -> crea un certificado y lo instala en la maquina.
+
+makecert ya no se utiliza.
+
+los certificados los puedo usar para firmar hash y enviarlos, una vez del lado del server se puede verificar si yo estoy enviando el hash sin alterar.
+
+
+* using code access permissions 
+CAS Code Access Security se utilzia para proteger la pc de codigo malisioso.
+este tiene las siguientes funciones
+define los permisos de accesos a recursos del sistema
+
+
+* securing string data
+
+usar simpre string para almacenar datos sencibles tiene ciertos problemas
+
+el valor pude ser movido alrededor de la memoriap or el GC dejando multiples copias alrededor.
+el valor del string no esta encriptado 
+string es immutable.
+es imposible que el GC remueva todas las copias de un string de memoria.
+
+.net offrece una clase especial q ayudan con string seguros.
+
+SecureString
+
+este automaticamente encripta sus valor asi qeu la posiblidad de un ataque encuentre texto plano disminuye.
+esta clase pone en una localizacion especial de memoria asi el GC no mueve el string a ningun lado.
+
+Objective 3.3: Manage assemblies
+-------------------------------------------
+los ensamblados son el producto de la compilacion realizada por el compilador (valga la redundancia)
+
+* what is an assembly?
+
+los ensamblados son completamente autocontenidos, ellos no necesitan informacion de un registgro o de otra locacion.
+contienen toda la informacion que necesitan para correr esto se llama "assembly's manifest"
+los ensamblados son neutrales respecto al lenguaje que se utiliza.
+son versionables.
+
+* signing assemblies using a strong name
+el CLR soporta dos tipos de ensamblados, strong-named assemblies and regular assemblies.
+los ensamblados regulares son estructuralmente iguales a los ensamblados fuertemente nombrados.
+la diferencia es que un ensamblado fuertemente nombrado son firmados por una llave publica/privada que lo identifica unicamenteal publicador del ensamblado y su contenido.
+
+un numero fuertemente tipado consistea en un simple nombre del ensamblado, la version de, la cultura y tambien la llave publica y una firma digital.
+
+esto tiene los siguientes beneficios:
+-------------------------------------
+
+- garantiza un unico ensamblado. la llave privada unica es usada apra generar el nombre del ensamblado, ningun otro ensamblado puede tener el mismo nombre.
+- proteje el versionamiento. ya que se meneja una llave privada, usted es el unico que puede distribuir versiones nuevas del ensamblado.
+
+verificacion de la integridad - el framework observa si un ensamblado ha cambiado desde el momento que se firmo.
+
+el desarrollador genera un ensamblado usando la llave privada para firmarlo, los usuarios pueueden verificar el asembly usando la llave publica que se distribulle con  el ensamblado.
+
+un ensamblado fuertemente nombrado no puede referencias dlls que no sean fuertemente nombradas.
+
+en ocasiones durante tiempo de desarrollo se puede firmar usando la llave publica, y una ves este a punto de hacer el deploy se puede usar la llave privada.
+
+"Authenticode" es una tecnologia que se usa certificados digitales para identificar el emisor de una aplicacion, la aplicacion se firma usando un certificado.
+
+* putting an assembly in the GAC
+los ensamblados locales a una aplicacion se denominan private assemblies.
+
+una forma de publicar un ensamblado es publicarlo en eGAC Global Assembly Cache, este es una libreria especializada para almacenar ensamblados, se encuentra en la maquina y es uno de los 
+lugares donde el CRL revisa cuando busca un ensamblado.
+ 
+normalmente se debe evitar instalar dlls aca, pero algunas de las razones para hacerlo pueden ser:
+cuando un dll es compartido por valias aplicaciones, por motivos de seguridad, o cuando se quieren publicar 
+varias versiones del mismo ensamblado.
+
+* versioning assemblies
+
+cada ensamblado almacena su numero de version, esta version sigue el siguiente patron
+
+{major version}.{minor version}.{build number}.{revision}
+
+major version: esta deberia contener muchas nuevas caracteristicas.
+minor version: se aumenta cuando se dan pequeños cambios a features existentes.
+build number: se aumenta cada que se hace una recompilacion o creacion del dll.
+revision: se usa para cuando se hacen parches.
+
+
+cuando mi app tiene una referencia privada el crl empieza a buscar en el directorio del app.
+se puede especificar una locacion extra donde el CLR puede ver en el archivo de configuracion.
+usando <probing> aca se puede especificar una ruta a otro directorio en el atributo privatePath esta ruta debe ser relativa partiendo de la ruta del app.
+
+otra opcion es usar el elemento codebase, donde se puede especificar la locacion de un dll que esta fuera del directorio de la app en otra maquina o sobre la red, este debe ser strong-named.
+cuando el .dll es localizado se coloca en una carpeta especial del GAC.
+
+Objective 3.4: Debug an application
+-------------------------------------------
+ debugging es el proceso de remover errores de la aplicacion.
+
+* build configuration
+cuando se crea un nuevo proyecto VS crea dos configuraciones build 
+o build configurations
+Release mode -> en este modeo el codigo compilado esta totalmente optimizado, no hay info extra para procesos de debugging.
+
+Debug mode -> en este modo no hay optimizacion e informacion adicional es publicada.
+
+* Creating and managing compiler directives
+C# no tiene un prepocesador especializado, pero tiene directivas de soporte, las cuales son instrucciones al compilador 
+para ayudar en el proceso de compilacion.
+
+algunas 
+#if 
+
+se pueden hacer simbolos propios usando #define
+usar este tipo de directivas hace el codigo dificil de leer lo mejor es evitarlas.
+
+
+pagina 227-8-9 leerlas de nuevo.
+el debugger crea un archivo de extension .PDB el cual contiene datos extra que anota el codigo de la aplicacion con informacion extra
+que puede ser valiosa durante el proceso de debugeo.
+
+
+Objective 3.5. Implement diagnostics in an application
+-------------------------------------------------------}
+
+tracing es la forma com se puede monitorear la ejecucion de la app mientras esta corriendo.
+la informacion puede ser detalladda.puede mostrar que  metodos son ejecutados, que decisiones son tomadas, errores o wrnings que pasan mientras el app corre
+logging esta siempre habilidato y es usado para reportar errores, se puede configurar el logging para guardar la info en un lugar centralizado.
+
+sourcetrace configurar diagnostigo desde XML
+<?xml version=”1.0” encoding=”utf-8” ?>
+<configuration>
+<system.diagnostics>
+<sources>
+<source name=”myTraceSource” switchName=”defaultSwitch”>
+<listeners>
+<add initializeData=”output.txt”
+type=”System.Diagnostics.TextWriterTraceListeer”
+name=”myLocalListener”>
+<filter type=”System.Diagnostics.EventTypeFilter”
+initializeData=”Warning”/>
+</add>
+<add name=”consoleListener” />
+<remove name=”Default”/>
+</listeners>
+</source>
+</sources>
+<sharedListeners>
+<add initializeData=”output.xml” type=”System.Diagnostics.XmlWriterTraceListener”
+name=”xmlListener” traceOutputOptions=”None” />
+<add type=”System.Diagnostics.ConsoleTraceListener” name=”consoleListener”
+traceOutputOptions=”None” />
+</sharedListeners>
+<switches>
+<add name=”defaultSwitch” value=”All” />
+</switches>
+</system.diagnostics>
+</configuration>
+
+
+profiling your app
+profiling es el proceso de determinar como una aplicaicon usa cierta cantidad de recursos
+se puede ver cuanta memoria usa el programa, que metodo esta siendo llamado, cuanto tiempo cada metodo para ejecutarse 
+
+un objeto es Stopwatch donde puedo medir cuanto tiempo transcurre y obtener el resultado en milisegundos.
+
+* creating and monitoring performance counter
+ estos pueden ser usados para monitorear el hardware servicios, aplicaicones, drivers.
+los counter que windows ofrece se pueden ver mediante el ferfmon.exe
+
+desde codigo tambien se pueden leer estos counters con la clase PerformanceCounter.
+se puede crear una aplicacion encargada de monitoreo.
+
+Logging and tracing are important to monitor an application that is in production and
+should be implemented right from the start.
+You can use the Debug and TraceSource classes to log and trace messages. By configuring
+different listeners, you can configure your application to know which data to send
+where.
+When you are experiencing performance problems, you can profile your application to
+find the root cause and fix it.
+Performance counters can be used to constantly monitor the health of your applications.
+
+
+

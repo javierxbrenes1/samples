@@ -1,0 +1,420 @@
+	Capitulo 1
+
+-------------
+Threads
+-------------
+
+context switching -> cuando windows cambia de un hilo a otro para ejecutarlo en el CPU.
+parallelism -> significa poder ejecutar multiples hilos en diferentes CPUs a la vez.
+
+el uso de la clase Thread debe hacerse solo cuando sea necesario.
+
+
+Solo definir un hilo prioritario cuando es necesario.
+Thread.Join es llamado en el proceso que invoca a es Thread para dejarlo esperando hasta que el otro hilo termine.
+thread.Sleep(0) se usa para notificarle a windows que el hilo esta terminado.
+
+dos conceptos basicos 
+
+foreground 
+pueden ser usados para mantener la aplicacion viva hasta que todos los hilos foreground terminen el CLR mata la aplicacion
+
+Background 
+Cuando el CLR mata la aplicacion los hilos mueren
+
+*para detener un hilo se puede usar el method Thread.Abort pero esto lanza una excepcion en el metod que se esta abortando lo que puede
+*generar un estado de corrupcion y hace la aplicacion inservible
+*Lo mejor es usar una una variable compartida que tanto el hilo objetivo y el hilo invocador puedan acceder.
+
+*si deseo utilizar una variable unicamente dentro de mi hilo y solo modificarla dentro del scope
+de dicho hilo puedo decorar dicha variable con [ThreadStatic] asi cada hilo que aceda dicha variable puede modificarla 
+pero dicha modificacion no afecta lo hecho por otro hilo dentro de esa variable, la variable debe ser static sino no funciona.
+
+-----------------
+Thread pools
+-----------------
+
+trabajar con la clase Thread permite crear un hilo cada vez y este hilo muere cuando el proceso termina, sin embargo crear
+hilos de esta forma genera un costo de tiempo y recursos.
+
+Un thread pool es creado para reusar esos hilos, en lugar de dejar el hilo morir este se envia al pool donde 
+puede ser reusado por otra solicitud.
+
+cuando se trabaja con el pool de .net se encola un item de trabajo que luego es tomado por un hilo disponible del pool.
+webservices utilizan threadpool, el server deja en cola las peticiones hasta que se liberen hilos capaces de tomar dichos
+request y procesarlos.
+
+el thread pool automaticamente maneja la cantidad de hilos necesarios para salir adelanto.
+
+cuando se usa el tread pool no hay forma de saber cuando la operacion ha terminado y cual es el valor de retorno.
+
+-----------------
+Usando Task
+-----------------
+
+Una tarea es un objeto que representa algun trabaja que debe ser hecho, un task puede indicarnos si el trabajo esta hecho
+y si la operacion retorno un resultado entonces la tarea devuelve dicho resultado.
+
+el task scheduler es el encargado de iniciar la tarea y manejarla, por defecto el task scheduler utiliza hilos del 
+thread pool para ejecutar dicha tarea.
+
+ejecutar una tarea en otro hilo tiene sentido solo si se desea mantener la UI libre para otros trabajos o si se desea para
+lelizar el trabajo en multiples procesos.
+
+el metodo wait es lo mismo que el metodo join de un thead, hace que el hilo padre o quien invoca al hilo espere hasta
+que el mismo termine.
+
+la clase task cuenta con una clase que implemente generics en caso de que esta deba retornar algun valor.
+cuando se desea leer el resultado de un task esto forza a quien desea saber el resultado ha esperar hasta que la tarea
+termine, el thread se bloqueara hasta que se cuente con el resultado.
+
+dentro de un task algo que se puede hacer es agregar una tarea de continuacion , esto significa agregar otra operacion 
+que se ejecuta tan pronto la task termine.
+
+el methodo continueWith tiene varias sobrecargas que permiten escribir distintos methodos que puedan ejecutarse cuando
+un excepcion pasa o la tarea es cancelada, o la tarea se completa correctamente.
+
+una task puede tener algunas tareas hijas, la tarea hija termina hasta que todas las tareas hijas hayan terminado.
+
+para hacer el proceso mas facil se puede usar la clase taskfactory, esta clase permite crear un objeto con cierta
+configuracion y puede usarse para crear tareas con esa misma configuracion.
+
+en lugar de utilizar el metodo wait se puede utilizar el metodo WaitAll si se tiene que esperar para que un grupo de 
+tareas termine.
+
+tambien se cuenta con el metodo whenall que permite programar un metodo que se ejecuta cuando todas las tareas han terminado.
+
+en vez de esperar hasta que todas las tareas terminen tambien se puede esperar hasta que alguna termine con 
+waitany.
+
+----------------------------
+Using the parrallel class
+----------------------------
+
+esta clase tiene algunos metodos estaticos como for, foreach, invoke que se pueden usar para paralelizar trabajo.
+Paralelismo significa tomar cierta tarea y dividirla en un conjunto de tareas relacionadas que pueden ser ejecutadas de 
+forma concurrente.
+
+Esto no significa que se deba cambiar cada loop por un loop paralelo,la clase parallel deberia usarse solo cuando 
+el codigo no tiene que ser ejecutado secuencialmente.
+
+incrementar el performance con procesos paralelos solo sucede cuando se tiene mucho trabajo por hacer que puede ser ejecutado
+de forma paralela.
+
+se puede detener un loop de un objeto parallel utilizando stop o break, si se utiliza break se asegura que todas las iteraciones
+que estan corriendo terminen antes de finilizar, si se utiliza stop todo se finaliza
+cuando se utiliza break el resultado de la variable en Iscompleted es false y el LowestBreakIteration es la ultima iteracion 
+donde quedo, si se usa stop este valor es nulo.
+
+
+------------------------------
+using async and await
+-----------------------------
+
+async and await son usados para procesos de I/O
+
+¿como funciona un proceso de I/O ? 
+cuando tu aplicacion esta ejecutando una operacion de I/O en el hilo principal de la misma el sistema operativo 
+nota que tu hilo esta esperando por una operacion de I/O, dado a esto windows detiene el hilo asi no puede
+user ningun recurso del CPU pero mientras hace esto sigue usando memoria y el hilo no puede ser usado para atender 
+otras solicitudes, lo cual hace que un nuevo hilo sea creado si alguna solicitud entra.
+
+el codigo asincronico resuelve este problema en lugar de bloquear el hilo hasta que el proceso de I/O finalice, 
+se otiene un objeto tipo task que representa el resultado de operacion asincronica, mediante el uso de este task que puede continuar 
+con la operacion de I/O hasta que termine al mismo tiempo el hilo esta disponible para otra tarea, cuando el proceso 
+de I/O termina el SO notifica el tiempo de ejecucion  y la continuacion de la tarea es asignada a un hilo del pool.
+
+C# tiene async y awat
+la palabra clave "async" marca un metodo o funcion para operaciones asyncronas.
+un metodo marcado como async inicia corriendo sincronicamente en el hilo actual.
+lo que hace es permitirle al metodo separse en multiples piezas, cada pieza es marcada con la palabra clave await.
+cuando usas wait el compilador genera codigo que observara si tu operacion asincronica ya ha terminado, el metodo 
+continua corriendo de forma sincronica, si el metodo no esta completo el state machine asignara un metodo de continuacion que sera ejecutado 
+cuando la tarea se complete, el metodo entrega el control a otro hilo llamado y con esto el hilo puede ser usado para otro proceso.
+
+el metodo Result es utilizado ya que el proceso asincrono esta siendo 
+invocado por un metodo que no puede ser marcado como azync y para poder bloquear el codigo hasta qeu el 
+metodo asincrono este finalizado se utiliza result.
+
+await permite escribir codigo que parece sincronico pero se comporta de forma asincrona
+
+
+--
+SynchronizationContext
+--
+este conecta el modelo de aplicacion con el modelo de hilos, abstrae la forma como diferentes aplicaciones (WPF, ASP.net)
+trabajan y se asegura que que se termine en el correcto hilo cuando se necesite actualizar algo en la UI o algun proceso 
+de solicitud web.
+
+el key await se asegura de que el contexto este guardado y que sea restaurado cuando la tarea finalice.
+desabilitar el contexto puede mejorar el performance de la aplicacion pero esto deberia hacer cuando por ejemplo se
+esta escribiendo contenido a un archivo mediante configureAwait(false)
+
+a la hora de crear metodos async es importante escoger un tipo de retorno task o task<T> y evitar retornar tipos void,
+el tipo de retorno void se puede usar solo si es en manejadores de eventos.
+
+
+--------------------------------------------------
+Using parallel language integrated Query (PLINQ)
+--------------------------------------------------
+
+PLINQ puede ser usad en objetos que potencialmente convierten un query secuencial en uno paralelo.
+
+el runtime determina si tiene sentido convertir la sentencia en un query paralelo, tambien se puede forzar
+que siempre lo haga paralelo utilizando el metodo withExecutionMode y especificar que debe ejecutarse en paralelo.
+
+tambien se puede limitar el numero de paralelismo que se va a usar con el metodo WitdegreeOfParallelism 
+corre queries en paralelo no garantiza que los datos esten en orden.
+
+----------------------------------------------------
+using concurrent collections
+----------------------------------------------------
+
+cuando se trabaja con entornos de multi threads se necesita estar seguro qeu no se estan manipulando objectos compartidos, 
+al mismo tiempo sin un acceso sincronizado.
+
+.net ofrece algunas colecciones clases usadas para el acceso concurrente a recursos.
+estas son thread-safe lo qeu significa que usan sincronizacion interna para asegurarse que pueden ser accedidas por multiples hilos al mismo tiempo.
+
+-> BlockingCollection<T> 
+esta es para agregar y remover datas, remover un item bloquea hasta que la data este disponible, agregar es rapido 
+pero si se desea se puede definir un limite que puede permitir bloquear el hilo hastq que haya espacio.
+
+una coleccion normal puede explotar cuando esta siendo usada en un escenario multitrading porque puede estar 
+siendo removida por un hilo mientras otro esta leyendo.
+
+-> concurrentBag
+esta es simplemente una bolsa de items, que permite valores duplicados y no tiene un orden.
+como concurrentbag implementa ienumerable puede ser recorrido por foreach, este proceso 
+es thread-safe pero para hacerlo se hace un snapshot de la lista lo que hace que si durante el ciclo se agregan
+mas elementos a la lista estos no seran vistos.
+
+-> ConcurrentStack y ConcurrentQueue
+estos son colas (FIFO) y pilas (LIFO), para una pila nunca se puede estar seguro si hay elementos dentro de la misma
+porque pueden haber multiples hilos accediendo a la coleccion al mismo tiempo.
+La pila puede ser enumerada pero para eso se toma un snapshot, la cola es exactamente igual la diferencia son los 
+metodos que se aplican.
+
+-> ConcurrentDictionary
+este almacena pares de llaves y valores de forma thread-safe 
+
+
+--------------------------------------------------------------------
+Manage Multithreading
+--------------------------------------------------------------------
+
+teabajar con multihilos puede ser dificil mas cuando varios hilos desean acceder al mismo recurso, 
+para eso la sincronizacion de recursos es importante.
+
+synchronizing resources.
+----------------------------
+
+uno de los problemas mas grandes es querer acceder el mismo recurso desde multiples hilos simultaneamente.
+Es por eso que sincronizar la data es importante y para esto C# ofrece el operador lock.
+al usar lock se asegura que un recurso sea accedido de forma sincronizada es decir solo un hilo puede manipularla y los demas
+deben esperar, esto puede causar una deficiencia de performance y ademas problemas con deadlocks cuando dos hilos esperan al mismo tiempo 
+el recurso y ningulo lo obtiene.
+para la sentencia lock se debe usar una variable de referencia ya que con una variable de valor debe hacerse un boxing lo que recurre en un bloqueo mas
+el compilador no permite usar variables de tipo valor en un lock.
+
+* clase volatil, el compilador es demaciado astuto y capaz de descubrir que hya codigo que no se ejecutara y quitarlo, pero tambien en algunas ocasiones
+cambia el orden de las lineas de codigo, si se desea evitar este comportamiento se puede marcar ya sea un atributo o una clase con la clave "volatile" 
+pero esto debe hacerse solo si se esta seguro de lo que se quiere hacer ya que esto desabilita opciones de optimizacion del compilador lo que 
+puede dañar el performance.
+
+the interlocked class
+---------------------------
+Esta clase permite realizar operaciones atomicas de forma que se garantiza el bloqueo de elementos hasta que se termine una operacion en ellos.
+la clase Interlocked cuenta con dos metodos, increment y decrement. que se pueden usar para procesos de resultados.
+para procesos mas complicados se puede usar el comando lock
+esta clase tambien permite cambiar valores en una variable usando el metodo exchange.
+
+Canceling task.
+------------------
+cuando se trabaja con multihilos en ocasiones es necesario cancelar tareas que llevan demaciado tiempo, para esto se les pasa una clase de cancelationToken
+el cual monitorea cuando se mande a llamar la cancelacion.
+
+
+
+---------------------------------------------------------------
+Implement program flow
+---------------------------------------------------------------
+
+Boolean expresions
+----------------------
+
+el uso de booleanos para tomar decisiones es importante, existen varios simbolos que permiten realizar la validacion de elementos o comparar elementos,
+(>,<, ==, !=) estas se pueden combinar por el uso de || o && o ^(or exclusivo)
+
+Un Retorna True si almenos un elemento es true o retorna false cuando ambos elementos son falsos.
+
+cuando el runtime nota que la parte izquierda de un OR es verdadera ya no evalua el resto, esto se llama short-circuiting.
+
+en caso de un AND se utiliza para validar que ambas partes de las sentencias sean verdaderas, si alguna es falsa se retorna falso.
+apra el AND tambien se aplica short-circuiting.
+
+el O exclusivo o (XOR) retorna true cuando exactamente un operando es true, debido a que se debe verificar ambos elementos 
+XOR no aplica short-circuiting.
+
+las variables definidas dentro de un bloque de codigo solo pueden ser usadas dentro de ese bloque pero nunca fuera del mismo.
+
+the null-coalescing operator
+------------------------------
+este operador (??) es usado para asignar un valor por default para un tipo con valor nulo.
+
+the conditional operator ( ? : )
+
+en un switch se puede usar el goto para ir a ejecutar otro caso.
+
+
+
+loop for los for deberian usarse cuando se conoce el numero de iteraciones que se haran.
+foreach son usados para iterar sobre colecciones.
+palablas claves, break y continue
+
+
+jump statements
+------------------------------
+
+una sentencia jump transfiere el control a otra parte en el codigo.
+dentro de estas estan break, continue y goto.
+
+goto mueve el control a una sentencia que esta marcada por una etiqueta.
+el control no puede ser transmitido fuera del scope de donde el goto se esta llamando.
+
+las sentencias break y continue pueden ser usadas en algunas situaciones pero debe tratar de no usarlas y evitarlas, 
+goto es aun peor es considerada una mala practica.
+
+-------------------------------------------------------
+Create and implement events and callbacks
+-------------------------------------------------------
+
+un evento puede ser usado para proveer notificaciones.
+se puede suscribir a un evento si se esta interezado en sus notificaciones.
+se pueden crear eventos usando delegados, expresiones lambda y metodos anonimos.
+
+Undestanding delegates
+------------------------------
+in c# delegados son la base para construir eventos.
+un delegado es un tipo que define la firma de un methodo.
+se puede invocar a un metodo a travez de un delegado.
+
+una caracteristica de los delegados es la llamada multicasting que te permite combinar mas de un metodo al mismo delegado usando 
++= comando permite agregar otro metodo al delegado.
+y para eliminar un metodo del delegado se utiliza -=
+el siguiente metodo del.GetInvocationList().GetLength(0); retorna cuantos metodos un delegado multicast va a invocar.
+
+en delegados existen dos conceptos
+
+Covariance
+-------------
+
+permite un metodo tenga un tipo de retorno que deriva del tipo de retorno del delegado
+
+si en mi retorno estoy esperando una clase base desde mi metodo puedo retornar una clase derivada de dicha clase.
+
+contracovariance
+------------------
+Permite un metodo con parametros de una clase base ser asigando a un delegado que espera un parametro de una clase derivada.
+
+Using lambda expressions
+--------------------------
+Las expresiones lambda son el camino favorito que tomar para escribir nuevo codigo.
+
+las funciones lambda son llamadas funciones anonimas ya que no tienen un nombre definido como los metodos.
+
+declarar un delegado apra un evento en ocasiones es engorroso, .net tiene un par de delegados predefinidos que se pueden usar
+
+uno de estos es Func<int, int, int> este representa un delegado que retorna un tipo y toma de 0 a 16 parametros.
+Un delegaod que no retorna parametros es system.Action que tambien toma de 0 a 16 parametros.
+
+
+Closure
+--------
+utlizar dentro de una funcion de un delegado variables que no pertenecen a al entonrno y q dichas variables siguen vivas hasta que el delegado muere.
+
+
+usar eventos
+-------------
+los delegados forman la base de los eventos en c#
+la palabra reservada event se utiliza para resolver una debilidad del uso de delegados para lanzar eventos y era que cualquier clase que empleara la clase que lanza el evento 
+podria facilmente ejecutar le metodo que lanza el evento para todos aquellos que escuchan dicho evento.
+
+hay varios cambios q ocurren por usar event.
+1) ya no se usa una propiedad publica sino un campo fisico.
+2) un evento no ser asignado usando = debe usarse +=
+3) ningun usuario externo puede lanzar el evento.
+
+entoncees como funcionan los eventos
+Mi clase crea un eventHandler, este delegado recibe un objeto como parametro ( que es mi objeto y recibe una clase que hereda de eventArgs
+
+mis otras clases pueden crear un metodo y asignarlo al evento el cual sera lanzado por algun proceso dentro de mi clase y le notificara
+a estas otras clases y el metodo o metodos definidos se ejecutaran.
+
+existe un custom event accessor que permite adaptar la adicion y el remuevo de subscriptores 
+este custom event accessor funciona como una propiedad solo que no tiene get ni set sino add y remove.
+usar lock dentro del accessor para hacerlo thread safe
+
+los eventos son ejecutados en el orden como se ingresan al delegado ( esto no es siempre asi)
+si un metodo asignado al delegado lanza una excepcion ningun evento que siga despues se ejecutara, es decir la ejecucion de los 
+metodos muere cuando se lanza una excepcion.
+
+si no se quiere esto:
+1) lanzar manualmente los eventos y manipular cualquier excepcion
+
+
+------------------------------------------------------------
+Implement exception handling
+------------------------------------------------------------
+
+
+handling exceptions 
+--------------------
+Cuando un error ocurre en algun lugar de la aplicacion una excepcion es lanzada, una excepcion es un objeto 
+que contiene (hold)  informacion acerca de que fue lo que ocurrio, donde ocurrio, hasta direccion a la pagina 
+donde se ofrece ayuda.
+
+las excepciones son manejadas mediante el uso de try/catch
+
+la palabra reservada finally es usada para ejecutar codigo si una excepcion se lanza o no.
+
+
+hay situaciones en las que se puede prevenir ejecutar un finally y esto puede ser logrado mediand elEnvironment.FailFast
+cuando este mensaje es llamado el mensaje y/o la excepcion se escriben en el log de eventos de windows y la aplicacion termina.
+
+Es importante asegurarse que el bloque finally no lance ninguna excepcion.
+
+Se atrapar excepciones cuando se puede resolver el problema o cuando se quiere almacenar el error.
+Es importante evitar bloques de catch en capaz bajas de la aplicacion, las bitacoras deberian tambien ser tomadas o hechas 
+a niveles altos de la aplicacion, de esta forma se evitan bitacoras de error en multiples capaz de la aplicacion.
+
+Throwing exceptions 
+-----------------------
+Cuando se desea lanzar una excepcion se necesita crear una instancia de la clase exception y usar la kewworld throw
+luego de esto el runtime buscara el bloque catch y finally.
+
+hay que evitar reusar objectos de tipo exception, cada ves que lance una excepcion se deberia crear un nuevo objeto especialmente cuando se trabaja en 
+entornos multihilo.
+
+cuando se manipula una excepcion esta se puede relanzar de tres formas.
+usar la palabra throw sola, esto relanza la excepcion sin modificar el stack.
+usar throw con la excepcion original, al hacer esto el stack se limpia, impidiendo que se vea donde la excepcion original paso..
+usar throw con una nueva excepcion, esto puede ser utili cuando se quiera lanzar otra excepcion 
+
+una forma de relanzar una excepcion preservando el stack origianl es usando el methodo ExceptionDispatchInfo.throw.
+esta forma se puede usar cuando se quiere capturar una exception en un hilo y mostrarlo en otro.
+ya que esto permite mover data entre hilos y lanzarlo.
+lanzar excepciones deberia ser algo de evitar, esto incluye en una carga de performance ya que el runtime debe buscar por todos los 
+bloques catchs hasta encontrar uno.
+
+Se debe evitar el uso directamente de la clase exception tanto cuando se atrapa como cuando se lanza, en lugar de esto se deben usar
+exception disponibles y mas epecificas.
+
+
+Creating custom exceptions 
+------------------------------
+
+cuando es necesario lanzar una excepcion deberia utilizarse las ya provistas por el sistema, pero en ocasiones se debe enviar una
+exception propia.
+
+toda excepcion propia debe llevar el sufijo Exception y ademas debe ser serializable para trabajar correctamente entre aplicaciones.

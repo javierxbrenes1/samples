@@ -1,0 +1,566 @@
+Chapter 2 Create and use types
+
+Create types
+-----------------
+
+escribir una aplicacion consiste en usar y crear tipos.
+
+choosing a type to create
+---------------------------
+objetos y tipos son los bloques fundamentales de creacion.
+un tipo puede ser visto como un plano para construir objetos.
+
+tipos en c#
+---------------
+el sistema de tpado de c# contiene tres categorias:
+Tipos por valor
+tipos por referencia
+tipos puntero (estos son raramente usados, se usan solo con codigo no seguro y cuando se necesite usar un puntero aritmetico).
+
+
+Creating enums
+-----------------
+este oferece la posibilidad de crear una lista de posibles opciones.
+usar enumeradores mejora la lectura, y el mantenimiento del codigo.
+Los enuymeradores pueden usar una atributo de "FLAGS" donde se puede usar un enumerador
+para definir multiples combinaciones de valores.
+
+
+Tipos por referencia y valor
+---------------------------------
+
+un tipo por referencia: contiene una referencia al valor real.
+un tipo por valor: contiene el valor directamente.
+
+Hay dos lugares donde el runtime almacena los valores de tipos en memoria.
+el heap y el stack.
+el valor de un tipo de referencia es almacenada en el heap y la direccion a ese valor 
+es almacenada en el stack.
+el valor de un tipo por valor es almacenado en el stack.
+los beneficios de almacenar datos en el stack son: es rapido, pequeño y no necesita atencion del GC.
+
+Los tres criterios para determinar cuando crear un tipo de valor:
+el objeto es pequeño
+el objeto es inmutable
+hay muchos objetos.
+
+
+giving your types some body.
+---------------------------------
+
+Adding behaviors.
+--------------------
+las acciones que una clase expone deben ser la razon primordial de su existencia.
+se debe pensar en una nueva clase en terminos de qeu puede hacer no en qeu datos almacena.
+se usa methods para agregar comportamiento a la clase.
+
+asegurar de que sus metodos estan enfocados en hacer una sola cosa y que el nombre de los metodos especifique claramente que hace.
+A nivel de parametros se debe preguntar solo por lo que se necesita, no se requiere mas informacion ni menos, siempre es lo que se necesita.
+
+Name arguments, optional arguments, overloading visibility.
+--------------------------------------------------------------
+name argument: usado para especificar cual argumento se quiere pasar.
+Optional arguments: se pueden usar cuando quieres especificar valores por defecto en algunos parametros.
+overloading: La posibilidad de crear metodos con mismo nombre pero que son diferentes en los argumentos que toman.
+
+el metodo de visiblidad por default es private, cuando no se declara la visiblidad de un metodo 
+se usa private.
+
+adding data 
+------------
+la forma mas facil de almacenar datos dentro de una clase es atravez de un "field"
+el cual ogrese un acceso directo al valor almacenado.
+un "field" puede ser marcado como read-only lo cual permite solo definirle un valor durante la contruccion del objeto, y luego 
+de esto el "field" no puede ser modificado.
+Si un "field" es definido en tiempo de compilacion se puede marcar como constante (const) de esta forma el compilador sabe que el valor 
+nunca va a cambiar.
+
+clase indexada 
+Una clase puede ser definida como un array
+
+
+Cuando se desea almacenar datos que no son especificos para una instancia se puede usar un campo de tipo "static"
+Los campos "estatic" no estan acoplados a una especifica instancia de la clase, para acceder a el no se tiene que
+crear una instancia, se pude acceder directamente.
+
+using a blueprint
+---------------------
+para usar un objeto se utiliza el new lo que crea una nueva instancia de un objeto, 
+new ejecuta el constructor, cada clase tiene un constructor por default sin argumentos,
+se pueden agregar constructores nuevos si se requiere.
+
+consejos para diseñar constgructores:
+1) asegurece de que su constructor tome tan pocos parametros como es necesario.
+2) mapee los parametros del contructor a propiedades de la clase.
+3) lance excepciones si es necesarios.
+4) no llame miembros virtuales de un objeto dentro de su contructor.
+
+
+una clase puede tener multiples contructores los cuales pueden ser encadenados a otros con esto 
+se puede evitar duplicar codigo.
+
+Designing classes
+-----------------------
+
+Se deben seguir algunos principios a la hora de diseñar clases que permiten que el codigo sea 
+mas facil de usar, mantener y extender, no usarlos podria generar una bola de nieve y un sistema
+ cuya arquitectura es una perceptible falta de algo.
+
+los principios se aseguran que el codigo tenga dos caracteristicas.
+
+alta cohesion 
+Bajo acoplamiento.
+
+using generic types.
+---------------------
+
+Un tipo generico utiliza el Parametro "Type" en lugar de definir todos los tipos.
+Los genericos son usados para promover el reuso de codigo.
+
+normalmente un tipo valor deberia ser convertido a objeto para se usado en una lista nogenerica,
+pero usando generic se puede evitar la penalizacion del performance por usar boxing and unboxing.
+
+los genericos pueden ser usados en estructuras, clases, interfaces, metodos, propiedades, y delegados.
+
+al usar genericos se puede limitar el tipo de valores que se pueden usar y esto se logra usando "where" a la hora de crear genericos.
+
+para un tipo por referencia el valor por default es null, para un tipo por valor por ejemplo un int el valor por default es 0
+pero cuando se esta trabajando con genericos ¿cual es el valor por default ?
+Bueno se puede usar el metodo "default(T)" para obtener el valor por default del generico enviado.
+
+
+Extending existing types
+-------------------------------
+con c# se puede extender un tipo sin tener que modificar el codigo existente.
+
+Extension methods
+------------------
+la diferencia entre un metodo regular static y metodo de extension es el uso de la palabra reservada "this"
+
+
+Overriding Methods.
+-----------------------
+
+otra forma de extender un tipo existente es usar herencia y sobreescritura.
+cuando un metodo es declarado como virtual se puede sobrecargar el metodo en la clase derivada.
+se puede reemplazar completamente la funcionalidad del metodo o agregar comportamiento al metodo de la clase base.
+
+
+la palabra reservada "sealed" deshabilita la herencia en una clase o la sobreescritura en un metodo.
+
+-----------------------------
+consume types
+-----------------------------
+
+
+Boxing and unboxing
+-------------------
+
+Boxing -> Es el proces de tomar un tipo por valor y ponerlo dentro de un nuevo objeto en el hea, y almacenar una referencia a el en el stack.
+Unboxing -> Es tomar un elemento del heap y returnarlo a un tipo de valor que contiene el valor del heap.
+
+
+boxing -> el cast es el implicito.
+unboxing -> se debe especificar explicitamente el cast que se va a hacer.
+
+boxing and unboxing pueden alterar el performance.
+
+
+converting between different types
+-----------------------------------
+
+el proceso de convertir un tipo a otro es llamado "type conversion"
+los cuales son:
+conversion implicita -> no necesita ningun tipo de sintaxis especial, es ejecutada por el compilador sabe que la conversion es permitida y es segura.
+conversion explicita -> el tipado seguro de C# proteje de todas aquellas conversiones implicitas que no son seguras, si se desea realizar una conversion 
+no segura se debe explicitamente indicar.
+
+una conversion explicita es llamada "casting" y siempre necesita una sintaxis especial.
+
+
+conversion definida por el usuario -> cuando se crean tipos de datos propios se puede agregar soporte a conversiones implictas o explicitas.
+
+conversion usando una clase ayudadora. -> el framework ofrece clases para la conversion entre tipos
+bitconverter para convertir entre tipos no compatibles
+convert para convertir entre tipos compatibles
+parse o tryparse son metodos en varios tipos.
+
+la interfaz IFormattable permite implementar Parse/tryParse en un tipo creado por uno.
+
+confirming that a conversion is valid
+-------------------------------------
+
+en algunas ocasiones se puede querer verificar si se puede convertir un tipo a otro o si dado un tipo base se puede convertir a un 
+tipo derivado.
+
+c# tiene dos operadores "is" y "as" que se pueden usar para verificar si un tipo puede ser convertido a otro y hacerlo en una forma segura, 
+"is" retorna true o false y "as" retorna el valor convertido o null si la conversion no es posible.
+el operador "as" es mas eficiente cuando se quiere usar el valor luego de la conversion, si solo se quiere verificr un tipo se puede usar
+"is"
+
+Using dynamic Types
+--------------------
+
+C# es un lenguaje fuertemente tipado, con el ingreso de dynamic se ingresa al mundo de los lenguajes debilmente tipados.
+cuando el compilador de c# encuentra un "dynamic" detiene el chequeo de tipado, es por eso que dynamic no gererara error en tiempo de compilacion 
+pero puede generar errores en tiempo de ejecucion.
+
+office automation APIs
+-----------------------
+para trabajar aplicaciones que usan COM (modelo de componentes) se utiliza el Primary Interop assembly lo que permite
+usar world, excell, y otras aplicaciones de office desde aplicaciones .net.
+
+antes de dynamics esto era complicado.
+
+dynamicObject and expandoObject
+---------------------------------
+
+dynamicObject es mas flexible cuando se hereda de esta se puede sobreescribier los miembros que permiten sobreescribier 
+operaciones como obtener o asignar un miembro.
+con dynamicObject se puede crear objetos realmente dinamicos y tener completo acceso a como ellos operan en tiempo de ejecusion
+
+expandoObject es una implementacion que permite definir y accesar propiedades en un tipo (por ejemplo viewBag)
+
+
+enforce encapsulation 
+------------------------
+
+Using access modifiers
+----------------------
+uno de los conceptos primordiales de la encapsulacion es esconder informacion 
+los modificadores de acceso permiten restingir el acceso a todos tipos y a los miembros de un tipo.
+
+estos son los modificadores de acceso en c#
+public no hay restriccion de acceso
+internal esta limitado al ensamblado.
+protected limitado a la clase y a clases derivadas.
+protected internal limitado al ensamblado o a clases derivadas.
+private limitado al tipo contenedor.
+
+
+hiding with private
+-------------------
+un miembro privado puede se accedido solo por miembros dentro del mismo tipo.
+
+esto permite que los usuarios de mi clase accedan a lo unico que yo les de permiso, si por ejemplo 
+defino una propiedad y cambio el comportamiento del valor de mi propiedad, agrego mas logica de negocio 
+mis usuarios no se daran cuenta ya que para ellos sigue siendo la misma propiedad.
+
+protecting accessibility in inheritance hierarchies
+---------------------------------------------------
+para acceder a propiedades, metodos, campos de mi clase padre, puedo acceder a ellos si estan marcados como 
+protected.
+
+keeping types internal to your assembly.
+------------------------------------------
+internal restringe el acceso a un tipo o a un miembro a un tipo en el mismo ensamblado,
+es mas restrictivo que public pero menos que private.
+
+
+
+en c# es una buena practica siempre explicitamente definir la visibilidad mas baja porque
+se desea esconder tanta informacion como sea posible.
+
+
+
+using properties
+----------------
+una propiedad es una forma en que c# usa el patron de encapsular el acceso a campos de la clase, 
+una propiedad luce com un campo regular, tiene tipo, nombre y un modificador de acceso la diferencia es que tiene accesos (get,set) 
+
+siempre prefiera propiedades sobre campos para miembros publicos.
+
+
+using explicit interface implementations
+----------------------------------------
+
+
+explicit interface implementation significa que un elemento del tipo de una interfaz puede ser accedido
+solamente cuando se utiliza la interfaz directamente,
+una explicit interface implementation puede ser agregada agregando el nombre de la interfaz y un punto a la implementacion.
+
+esto puede usar para esconder miembros de una clase a usuarios externos o bien cuando una clase hereda de dos interfaces
+que tienen en mismo metodo.
+
+
+create and implement a class hierarchy
+--------------------------------------
+herehcia es otro pilar de OOP, es el proceso de dejar que una clase derive de otra clase, herencia establece entre una clase y otra 
+una relacion de "es un tipo de", asegura la reutilizacion de codigo.
+
+Designing and implementing interfaces
+-------------------------------------
+
+una interface contiene la firma publica de metodos, propiedades, eventos e indices, un objeto o una estructura pueden implementar una interface.
+
+clases pueden heredar de otras interfaces, creando una cadena de interfaces, la clase que hereda de esta cadena debe implementar todos los metodos definidos
+a lo largo de la cadena.
+
+para una interfaz tambien se pueden utilizar genericos.
+
+using interfaces
+------------------
+
+una interfaz no puede instanciarse directamente.
+solo se puede instanciar un tipo concreto que implementa la interfaz.
+
+
+creating and using base classes
+-------------------------------
+
+cuando se quiere heredar codigo implententado se puede heredar de otra clase.
+
+changing behavior
+-----------------
+
+hacer un metodo "virtual" permite derivar la clases para sobrecargar el metodo, la clase derivada puede escojer reemplazar o extender el comportamiento de la clase.
+
+si la clase base no declara el metodo como virtual la clase derivada no puede sobre escribir el metodo, aunque lo puede hacer utilizando la palabra reservada
+new lo cual explicitamente esconde el miembro desde la clase base (debe evitarse el uso de new).
+
+
+abstract and sealed base classes
+--------------------------------
+
+abstract -> cuando se desea que una clase base no sea instanciada se define como abstracta., esta clase puede tener codigo implementado para sus miembros, pero no es requerido.
+una clase abstracta puede tener miembros complentamente implementados o miembros abstractos que un objeto que hereda de la clase abstracta debe implementar como lo hace ocn una interfaz.
+
+sealed -> es una clase de la que no puede derivarse ninguna otra.
+todos los miembros deben tener una implementacion.
+marcar la clase como sealed es una buena practica para evitar que otros comiencen a heredar de las clases.
+
+la diferencia entre una interfaz y una clase abstracta es que la interfaz no tiene ninguna implementacion de codigo y la clase abstracta puede tener metodos implementadoso 
+dejar la implementacion a las clases derivadas.
+
+
+principio de sustitucion de liskov
+----------------------------------
+
+este principio establece que una subclase debe ser usable en cada lugar donde una clase base puede ser usada.y esto no deberia cambiar el comportamiento que el usuario 
+espera.
+
+
+implementing standard .net framework interfaces.
+-------------------------------------------------
+
+algunas interfaces que se pueden usar son 
+Icomparable -> para ordenar elementos, determinar en que orden esta un elemento respecto al enviado a comparar como argumento.
+
+IEnumerable -> ayudan a implementar el patron iterador, despliega un metodo GetEnumerator el cual permite movenext al siguiente elemento de una coleccion y obtener el valor mediante current.
+
+IDisposable -> facilita el trabajar con externos y no administrados recursos, esta interfaz solo tiene un metodo llamado Dispose() que es usado para liberar cualquier
+recurso no administrado
+
+IUnknown -> usada para crear clases que envuelven objetos provenientes del COM.
+
+
+Find, execute, and create types at runtime by using reflection
+--------------------------------------------------------------
+
+reflexion es el proceso de obtener/recuperar la metadata (informacion referente a datos) 
+en tiempo de ejecucion.
+
+creating and using attributes
+-----------------------------
+
+usar atributos es una forma de agregar metadata a aplicaciones, se puede agregar a ensamblados, metodos, parametros, propiedades.
+
+applying attributes.
+--------------------
+los atributos se aplican, agregando el nombre del atributo en parentesis cuadrados []
+sobre la declaracion a la que se le desea agregar un atributo.
+un elemento puede tener tantos atributos como se requira, algunos se pueden aplicar multiples veces.
+
+
+reading attributes
+------------------
+.net permite recuperar atributos mediante reflexion
+
+incluso se puede obtener la instancia de un atributo y ver las propiedades.
+
+
+create custom attribute
+-----------------------
+
+se pueden crear atributos propios, estos deben de derivar de System.Attribute
+cuando se definen desde un inicio se deben definir los objetivos
+a un atributo se le pueden agregar propiedades.
+
+using reflection
+----------------
+
+reflexion es mas lenta que la ejecusion de codigo normal sin embargo da una flexibilidad que el codigo estatico no puede.
+
+using codeDom and lambda expression to generate code
+------------------------------------------------------
+c# permite generar codigo en tiempo de ejecusion, y una forma es a travez de CodeDom.
+un codeCompileUnit es visto como un contenedor que tiene definido, un namespace, clases, methodos, sentencias individuales.
+
+
+lambda Expresions
+----------------------
+son una forma facil de crear un metodo anonimo.
+
+c# provee delegados predefinidos, 
+Action cuando se requiere un delegado que no retorna parametros, 
+func<...> cuando el delegado retorna parametros.
+
+Expression trees
+----------------
+
+un arbol de expresion describe codigo en lugar de ser codigo en simismo, son fuertemente usados en LINQ.
+
+
+
+Manage the object life cycle
+-----------------------------
+C# utiliza el Garbage collection para lidiar con la liberacion de memoria, pero solo con objectos manejables, 
+cuando se utilizan objetos no manejables como conexiones a base de datos debe ser el dev quien se encargue 
+de liberar la memoria de dichos objetos.
+
+Entender el garbage collection
+------------------------------
+
+hay dos lugares donde el CLR almacena elementos mientras el codigo se ejecuta,
+el heap y el stack
+en el stack se mantiene lo que se esta ejecutando en el codigo 
+en el heap se almacenan los objetos.
+
+el stack es automaticamente limpiado al final de un metodo, el CRL se encarga de esto.
+el heap es manejado por el GC.
+
+el GC trabaja con un algoritmo  mark y un compact.
+la fase mark de una coleccion revisa que items del heap siguen siendo referenciados por un item root (este root puede ser un parametro de metodo, un campo estatico , un registro del CPU)
+si se encuentra un elmento en el heap vivo se marca, luego de esto la operacion de compactacion inicia el GC mueve todos los heaps vivos juntos uno de otro y libera la memoria 
+de todos los otros objetos.
+ para llevarlo a cabo el GC debe garantixzar que no se esta cambiando nada es por eso que todos los hilos se detienen mientras el GC hace el proceso.
+este proceso tiene un impacto en el performance muy alto.
+
+el GC solo inicia la limpieza cuando no hay suficiente espacio en el HEAP para contruir un nuevo objeto  o cuando windows notifica que hay baja memoria.
+asi que si hay espacio suficiente el GC no correra y cuando lo hace trata de hacerlo en el momento que el uso de aplicacion es baja.
+
+el GC se enfoca en lo elementos generacion 0
+
+en resumen el GC remueve elementos del heap que no son necearios y se asegura que ningun objeto se quede vivo y ocupando memoria si no se esta usando.
+
+Managing unmanaged resourses
+-----------------------------
+recursos no administrados pueden ser conexiones de red, manipulacion de archivos, el desarrollador debe explicitamente liberar esos elementos.
+debido a esto c# maneja el concepto de "finalization" esto le permite a un tipo ser limpiado antes por el GC.
+para esto se necesita cierta sintaxis, el nombre de la clase con ~ como prefijo
+
+dentro de un finalizador se pueden limpiar otros recursos y asegurarse que toda la memoria es librerada.
+
+el metodo finalizer es ejecutado solo cuando el GC ocurra.
+
+en ocasiones se puede forzar un GC con GC.collect pero no es recomendable llamarlo.
+
+lo que es importante entender es quee finalizers incrementan la vida de un objeto, ya que el finalizador es un metodo que debe correrse, 
+el .NET  framework mantiene la referencia viva en una cola de finalizacion especial, donde un hilo adicional corre todos los finalzadores,
+esto retraza al GC.
+ esto no es lo ideal no se deberia depender del GC para correr el finalizador en algun momento, de hecho esto se puede hacer por uno mismo, C# ofrece la oportunidad
+de explicitamente liberar recursos no manejados, usnado la interfaz IDIsposable.
+
+esta interfaz ofrece un unico metodo dispose() que se puede usar para liberar cualquier recurso no administgrado inmediatamente.
+
+que pasa si ocurre una exepcion antes del stream, para asegurarse que se limpien los recursos, c# tiene un tratamiento especial para esto, la "using" declaracion
+esta es transformada en un try/finally que llama al dispose, por esto el using solo debe ser usado con elementos de tipo IDisposable
+
+la sentencia using se asegura que el dispose siempre sea llamado.
+
+
+Implementing IDisposable and a finalizer
+----------------------------------------
+
+hacelo esto por cuenta propia no es una tarea trivial.
+
+
+diferencia entre un finalizador y usar IDisposable
+--------------------------------------------------
+
+Ambos se usan para limpiar objetos pero un finalizador es llamado por el GC, mientras que un metodo dispose puede ser llamado por codigo.
+
+Weak References
+---------------
+un tipo Weak Reference no contiene/sostiene una referencia real a un item del heap, asi que n opuede ser recogida por el GC, pero cuando el GC no se ha ejecutado 
+todavia, se puede tener acceso a un item a travez del este weak reference.
+
+
+using string in the .net framework
+----------------------------------
+
+un objeto script contiene un array de Car internamente.
+un string es un tipo de refernecia que luce como un tipo por valor.
+string es inmutable lo que quiere decir que no puede ser cambiado una vez es creado.
+cada cambio a un string volvera a crear un nuevo string, es por eso que todos los mretodos para manipular un string retornan uno nuevo.
+"string interning"-> proceso que ocurre cuando el compilador se da cuenta que dos strings son literalmente exactos, se asegura que solo uno sea creado por el CLR, esto ocurre solo en tiempo de ejecucion.
+
+manipulating strings
+---------------------
+
+stringbuilder
+-------------
+
+esta clase puede ser unada cuando se trabaja con string dentro de un loop, en lugar de crear un nuevo string cada ves, el stringbuilder usa un buffer iunternamente que mejora el perfomance
+incluso este permite cambiar el valor de un caracter individual dentro de un string.
+
+StringWriter y StreamReader
+----------------------------
+
+algunas APIS no pueden trabajar con un string o un stringbuilder, asi que se usa un stringwriter y un streamreader.
+internamente estas clases, usan stringbuilder.
+
+searching for strings
+----------------------
+
+.net tiene una serie de metodos que ayudan a mejorar el performance para acciones de busqueda dentro de un string
+indexof
+lastindexof
+startwith
+endwith
+substring
+
+estos metodos son sencibles a la cultura, es por eso que aceptan una isntancia de StirngComparison, 
+siempre hay q evistar metodos que no usen este enumerador
+
+otra forma de validar texto o hacer busquedas es usando expresiones regulares.
+
+Enumerating string
+-------------------
+un string es un arreglo de caracteres asi qeu se pueden enumerar un string como una tipica coleccion.
+split se usa para separar las palabras por un caracter definido, retorna un array
+si se debe hacer un split sobre mucho texto lo mejor es usar expresiones regulares.
+
+formatting strings
+-------------------
+formatting es el proceso de convertir una instancia de un tipo a una representacion de texto.
+esto casi siempre se hace mediante Tostring(), el cual puede ser sobreescrito para darme mayor valor.
+
+format string son strings que describen como un objeto debe desplegarse.
+
+proveer el correcto CultureInfo es importante para formatear valores, contiene toda la info necesaria sobre como un valor es mostrado en la cultura.
+hay que asegurarse que la data en la BD sea almacenada sin formato para que al ser traida pueda ser formateada a la cultura de quien ven los datos.
+
+el formato se puede customizar creando usted un patron para sus tipos.
+
+
+IformatProvider and IFormattable
+--------------------------------
+
+cuando se formatea un string se pueden usar estas dos interfaces, 
+iformatprovider tiene un metodo getformat el cual retorna la informacion de formato para hacer el formateo de un tipo.
+
+
+consejos para trabajar con varias culturas.
+
+* asegurarse que todas las comparaciones de strings usan una sobrecarga explicita que toma un objeto tipo StringComparison
+* usar stringcomparison.Ordinal o StirngComparision.OrdinalIgnoreCase cuando se comparen strings.
+* usar stringComparison.currentculture cuando se muestre datos al usuario.
+* asegurece que toda la data sea almacenada con la cultura invariante.
+* asegurese de no usar String.compare or compareTo
+* implemente IFormattable para tipos propios que son desplegados al usuario para asegurarse que toda las reglas de la cultura son respetadas.
+* use el formato correcto de strings cuando se deplieguen numeros, fechas, y tiempos al usuario.
+
+
+
+
