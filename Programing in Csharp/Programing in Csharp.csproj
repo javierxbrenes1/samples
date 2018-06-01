@@ -31,9 +31,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,11 +46,62 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cap 4 IO\objective 1 files\DriveClass.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\AsyncAwait.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\BlockingCollecs.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\Classic_Thread.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\ConcurrentBag.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\ConcurrentDictionaryClass.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\FIFOYLIFO.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\ParallelClass.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\PLINQ.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\Tasks.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 1- Multithreading an Async\ThreadPools.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 2-Manage Multithreading\AccessingShareData.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 2-Manage Multithreading\CancelingTask.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 4 - Create events and callbacks\DelegateClass.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 4 - Create events and callbacks\EventClass.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 4 - Create events and callbacks\LambdaClass.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 5 - Handling Exceptions\ExceptionClass.cs" />
+    <Compile Include="Cap 1 - Manage Program Flow\Objective 5 - Handling Exceptions\OrderProcessingException.cs" />
+    <Compile Include="Cap 2 - using types\Objective 5 - reflexion\AttributesClasses.cs" />
+    <Compile Include="Cap 2 - using types\Objective 1 - Create types\ConstructorChaining.cs" />
+    <Compile Include="Cap 2 - using types\Objective 1 - Create types\enumclass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 1 - Create types\ExtensionMethodClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 1 - Create types\Generics.cs" />
+    <Compile Include="Cap 2 - using types\Objective 1 - Create types\StructClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 2 Consume Types\ConvertingClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 3 Enforce encapsulation\AccessModifiersClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 3 Enforce encapsulation\ExplicitInterfaceClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 4 create an implement a class hierarchy\AbstractClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 4 create an implement a class hierarchy\BaseClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 4 create an implement a class hierarchy\InterfaceClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 5 - reflexion\CodeComClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 5 - reflexion\pluginsClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 5 - reflexion\ReflectionClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 6 manage te life cycle of app\FinalizerClass.cs" />
+    <Compile Include="Cap 2 - using types\Objective 7 Working with strings\stringClasses.cs" />
+    <Compile Include="Cap 3 debugging and security\chapter 1 Validate application input\Inputclass.cs" />
+    <Compile Include="Cap 3 debugging and security\chapter 2 security\AESAlgorithm.cs" />
+    <Compile Include="Cap 3 debugging and security\chapter 2 security\AsymmetricClass.cs" />
+    <Compile Include="Cap 3 debugging and security\chapter 2 security\CertificateClass.cs" />
+    <Compile Include="Cap 3 debugging and security\chapter 2 security\HashingClass.cs" />
+    <Compile Include="Cap 3 debugging and security\chapter 2 security\SecureStringClass.cs" />
+    <Compile Include="Cap 3 debugging and security\chapter 3 debugging\DirectivesCompilerClass.cs" />
+    <Compile Include="Cap 3 debugging and security\chapter 3 debugging\tracingAndDebuging.cs" />
+    <Compile Include="Excel\Application.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Cap 1 - Manage Program Flow\Objective 3 Implement program flow\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
